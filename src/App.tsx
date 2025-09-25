@@ -16,8 +16,8 @@ import {
 } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import Home from "./components/Home";
-import About from "./components/About";
-import EntityList from "./components/EntityList";
+import Turrets from "./components/DeviceManagement/Turrets";
+import Users from "./components/AccountManagement/Users";
 
 const { Header, Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
@@ -257,9 +257,9 @@ export default function App() {
         {/* === MAIN CONTENT === */}
         <Content style={{ width: "100vw", padding: 24 }}>
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/device/turrets" element={<EntityList/>} />
+            <Route path="/" element={<Home />} />            
+            <Route path="/device/turrets" element={<Turrets/>} />
+            <Route path="/account/users" element={<Users/>} />
             {/* you can add all route components here later */}
           </Routes>
         </Content>
