@@ -1,6 +1,7 @@
 // src/App.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
+import { useAppContext } from "./contexts/AppContext";
 import {
   ConfigProvider,
   Layout,
@@ -15,15 +16,27 @@ import {
   LogoutOutlined,
 } from "@ant-design/icons";
 import "antd/dist/reset.css";
+import BTLogo from "./components/BTLogo";
 import Home from "./components/Home";
 import Turrets from "./components/DeviceManagement/Turrets";
+import BTPT from "./components/DeviceManagement/BTPT";
+import TPOs from "./components/DeviceManagement/TPOs";
 import Users from "./components/AccountManagement/Users";
 
 const { Header, Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 export default function App() {
-  const [dark, setDark] = useState(false);
+  const { pageSize, setPageSize, isDarkMode, toggleTheme } = useAppContext();
+
+  // Add dark class to body for proper dark mode styling
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   // helper for navigation links
   const nav = (path: string, label: string) => <Link to={path}>{label}</Link>;
@@ -34,7 +47,7 @@ export default function App() {
       key: "device",
       label: "Device Management",
       children: [
-        { key: "prod-tools", label: nav("/device/prod-tools", "Productivity Tools") },
+        { key: "prod-tools", label: nav("/device/btpt", "Productivity Tools") },
         { key: "prod-tools-clusters", label: nav("/device/prod-tools-clusters", "Productivity Tools Clusters") },
         { key: "geo-groups", label: nav("/device/geographic-groups", "Geographic Groups") },
         { key: "turrets", label: nav("/device/turrets", "Turrets") },
@@ -85,7 +98,6 @@ export default function App() {
         { key: "groups", label: nav("/console/admin-groups", "Administrator Groups") },
         { key: "password", label: nav("/console/admin-password", "Admin. Password") },
         { key: "help", label: nav("/console/help", "Help") },
-        { key: "about", label: nav("/about", "About") },
       ],
     },
     {
@@ -149,11 +161,20 @@ export default function App() {
   return (
     <ConfigProvider
       theme={{
-        algorithm: dark ? darkAlgorithm : defaultAlgorithm,
+        algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
         token: {
           colorPrimary: "#6400AA", // BT purple
           fontSize: 13,
           controlHeight: 32,
+          colorBgContainer: isDarkMode ? "#141414" : "#ffffff",
+          colorBgElevated: isDarkMode ? "#1f1f1f" : "#ffffff",
+          colorText: isDarkMode ? "#ffffff" : "#000000",
+          colorTextSecondary: isDarkMode ? "#a6a6a6" : "#666666",
+          colorBorder: isDarkMode ? "#424242" : "#d9d9d9",
+          colorBorderSecondary: isDarkMode ? "#303030" : "#f0f0f0",
+          colorFillSecondary: isDarkMode ? "#262626" : "#fafafa",
+          colorFillTertiary: isDarkMode ? "#1f1f1f" : "#f5f5f5",
+          colorFillQuaternary: isDarkMode ? "#141414" : "#f0f0f0",
         },
         components: {
           Menu: {
@@ -162,16 +183,20 @@ export default function App() {
         },
       }}
     >
-      <Layout style={{ minHeight: "100vh" }}>
+      <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         {/* === FIXED HEADER === */}
         <Header
           style={{
             padding: 0,
-            position: "sticky",
+            position: "fixed",
             top: 0,
+            left: 0,
+            right: 0,
             zIndex: 1000,
             width: "100%",
             background: "#6400AA",
+            height: "64px",
+            flexShrink: 0,
           }}
         >
           <div
@@ -184,8 +209,16 @@ export default function App() {
             }}
           >
             {/* Left: Logo / App title */}
-            <div style={{ color: "#fff", fontWeight: 700, fontSize: "1.1rem" }}>
-              BT Trading & Command
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: 12,
+              color: "#fff", 
+              fontWeight: 700, 
+              fontSize: "1.1rem" 
+            }}>
+              <BTLogo size={36} />
+              <span>BT Trading & Command</span>
             </div>
 
             {/* Right: Items per page, Username, Theme, Logout */}
@@ -201,7 +234,8 @@ export default function App() {
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span>Items per page:</span>
                 <Select
-                  defaultValue="500"
+                  value={pageSize.toString()}
+                  onChange={(value) => setPageSize(parseInt(value, 10))}
                   style={{ width: 80 }}
                   options={[
                     { value: "25", label: "25" },
@@ -228,8 +262,8 @@ export default function App() {
 
               {/* Theme switch */}
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span>{dark ? "Dark" : "Light"}</span>
-                <Switch checked={dark} onChange={setDark} />
+                <span>{isDarkMode ? "Dark" : "Light"}</span>
+                <Switch checked={isDarkMode} onChange={toggleTheme} />
               </div>
 
               {/* Logout */}
@@ -248,24 +282,69 @@ export default function App() {
         </Header>
 
         {/* === SECOND NAV MENU BAR === */}
-        <Menu
-          mode="horizontal"
-          theme={dark ? "dark" : "light"}
-          items={menuItems}
-        />
+        <div
+          style={{
+            position: "fixed",
+            top: "64px",
+            left: 0,
+            right: 0,
+            zIndex: 999,
+            flexShrink: 0,
+          }}
+        >
+          <Menu
+            mode="horizontal"
+            theme={isDarkMode ? "dark" : "light"}
+            items={menuItems}
+            style={{
+              height: "48px",
+              lineHeight: "48px",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              flex: 1,
+              minHeight: "48px",
+              maxHeight: "48px",
+            }}
+            overflowedIndicator={null}
+          />
+        </div>
 
         {/* === MAIN CONTENT === */}
-        <Content style={{ width: "100vw", padding: 24 }}>
+        <Content 
+          style={{ 
+            marginTop: "112px", // 64px header + 48px menu
+            marginBottom: "40px", // Footer height
+            padding: 24,
+            overflow: "hidden", // No scrolling on main content
+            flex: 1,
+            height: "calc(100vh - 152px)", // Fixed height, no min-height
+          }}
+        >
           <Routes>
             <Route path="/" element={<Home />} />            
             <Route path="/device/turrets" element={<Turrets/>} />
+            <Route path="/device/btpt" element={<BTPT/>} />
+            <Route path="/device/tpos" element={<TPOs/>} />
             <Route path="/account/users" element={<Users/>} />
             {/* you can add all route components here later */}
           </Routes>
         </Content>
 
         {/* === FOOTER === */}
-        <Footer style={{ textAlign: "center" }}>
+        <Footer 
+          style={{ 
+            textAlign: "center",
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: "40px",
+            lineHeight: "40px",
+            padding: "8px 24px",
+            flexShrink: 0,
+            zIndex: 998,
+          }}
+        >
           © {new Date().getFullYear()} BT Trading & Command
         </Footer>
       </Layout>

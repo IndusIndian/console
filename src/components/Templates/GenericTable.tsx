@@ -4,6 +4,7 @@ import { Table, Button, Space, Input, Select, message } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import axios from "axios";
+import { useAppContext } from "../../contexts/AppContext";
 
 const { Search } = Input;
 
@@ -20,11 +21,13 @@ export default function GenericTable<T extends { key: string | number }>({
   filterField,
   searchField,
 }: GenericTableProps<T>) {
+  const { pageSize } = useAppContext();
   const [data, setData] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [searchText, setSearchText] = useState("");
   const [filterValue, setFilterValue] = useState("Any");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchData = async () => {
     setLoading(true);
@@ -39,22 +42,9 @@ export default function GenericTable<T extends { key: string | number }>({
     }
   };
 
-useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get<T[]>(uri);
-      setData(response.data);
-    } catch (error) {
-      console.error(error);
-      message.error("Failed to load data from API");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, [uri]);
+  useEffect(() => {
+    fetchData();
+  }, [uri]);
 
   const filteredData = useMemo(() => {
     let filtered = data;
@@ -74,7 +64,7 @@ useEffect(() => {
   const rowSelection = { selectedRowKeys, onChange: setSelectedRowKeys };
 
   return (
-    <div style={{ padding: 16 }}>
+    <div style={{ width: "100%" }}>
       {/* Action Bar */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 12 }}>
         <Space>
@@ -109,14 +99,28 @@ useEffect(() => {
 
       {/* Data Table */}
       <Table
-        
         rowSelection={rowSelection}
         columns={columns}
         dataSource={filteredData}
         loading={loading}
-        pagination={{ pageSize: 10 }}
-        bordered
+        pagination={{ 
+          pageSize,
+          current: currentPage,
+          onChange: (page) => setCurrentPage(page),
+          showTotal: (total, range) => 
+            `Showing ${range[0]}-${range[1]} of ${total} records`
+        }}
         size="small"
+        scroll={{ x: 'max-content' }}
+        style={{ width: "100%" }}
+        components={{
+          header: {
+            cell: (props: any) => <th {...props} style={{ ...props.style, padding: '4px 8px' }} />
+          },
+          body: {
+            cell: (props: any) => <td {...props} style={{ ...props.style, padding: '4px 8px' }} />
+          }
+        }}
       />
     </div>
   );
