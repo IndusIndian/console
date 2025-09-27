@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { 
   Tabs, 
   Form, 
@@ -13,6 +13,9 @@ import {
   Typography,
   message
 } from 'antd';
+import GenericTable from '../Templates/GenericTable';
+import SettingsPanel from '../Templates/SettingsPanel';
+import type { ColumnsType } from 'antd/es/table';
 import { 
   ArrowLeftOutlined, 
   SearchOutlined, 
@@ -24,7 +27,6 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../contexts/AppContext';
 
-const { TabPane } = Tabs;
 const { TextArea } = Input;
 const { Option } = Select;
 const { Text } = Typography;
@@ -48,6 +50,16 @@ interface UserData {
   fallbackPinCode?: string;
 }
 
+interface LineData {
+  key: string;
+  type: string;
+  sipDisplayName: string;
+  sipExtension: string;
+  sipDigest: string;
+  sipDomain: string;
+  tpoDnsName: string;
+}
+
 interface Profile {
   id: string;
   name: string;
@@ -61,7 +73,7 @@ interface Directory {
   selected: boolean;
 }
 
-const UserEdit: React.FC = () => {
+const UserEdit: React.FC = memo(() => {
   const navigate = useNavigate();
   const { isDarkMode } = useAppContext();
   const [form] = Form.useForm();
@@ -83,6 +95,95 @@ const UserEdit: React.FC = () => {
   // Profile selection state
   const [selectedProfileItems, setSelectedProfileItems] = useState<string[]>([]);
   const [selectedDirectoryItems, setSelectedDirectoryItems] = useState<string[]>([]);
+
+  // Lines sample data
+  const linesSampleData: LineData[] = [
+    {
+      key: '1',
+      type: 'DDI Sharing Line',
+      sipDisplayName: '+441932778327',
+      sipExtension: '+441932778327',
+      sipDigest: '',
+      sipDomain: '',
+      tpoDnsName: '',
+    },
+    {
+      key: '2',
+      type: 'DDI Sharing Line',
+      sipDisplayName: '1111',
+      sipExtension: '1111',
+      sipDigest: '',
+      sipDomain: '',
+      tpoDnsName: 'inherited',
+    },
+    {
+      key: '3',
+      type: 'DDI Sharing Line',
+      sipDisplayName: 'IPVegaPort1',
+      sipExtension: '2201',
+      sipDigest: '',
+      sipDomain: '',
+      tpoDnsName: 'inherited',
+    },
+    {
+      key: '4',
+      type: 'DDI Sharing Line',
+      sipDisplayName: 'IPVegaPort2',
+      sipExtension: '2202',
+      sipDigest: '',
+      sipDomain: '',
+      tpoDnsName: 'inherited',
+    },
+    {
+      key: '5',
+      type: 'DDI Sharing Line',
+      sipDisplayName: 'IPVegaPort3',
+      sipExtension: '2203',
+      sipDigest: '',
+      sipDomain: '',
+      tpoDnsName: 'inherited',
+    },
+  ];
+
+  // Lines columns
+  const linesColumns: ColumnsType<LineData> = [
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      width: 150,
+    },
+    {
+      title: 'SIP Display Name',
+      dataIndex: 'sipDisplayName',
+      key: 'sipDisplayName',
+      width: 200,
+    },
+    {
+      title: 'SIP Extension',
+      dataIndex: 'sipExtension',
+      key: 'sipExtension',
+      width: 150,
+    },
+    {
+      title: 'SIP Digest',
+      dataIndex: 'sipDigest',
+      key: 'sipDigest',
+      width: 150,
+    },
+    {
+      title: 'SIP Domain',
+      dataIndex: 'sipDomain',
+      key: 'sipDomain',
+      width: 150,
+    },
+    {
+      title: 'TPO DNS Name',
+      dataIndex: 'tpoDnsName',
+      key: 'tpoDnsName',
+      width: 150,
+    },
+  ];
 
   // Load user data on component mount
   useEffect(() => {
@@ -283,18 +384,40 @@ const UserEdit: React.FC = () => {
           alignItems: 'center',
           padding: '16px 0'
         }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '12px' 
+          }}>
+            <div style={{ 
+              fontSize: '18px', 
+              fontWeight: '600', 
+              color: isDarkMode ? '#fff' : '#262626' 
+            }}>
+              Account Management: User Edition
+            </div>
+            <div style={{ 
+              fontSize: '16px', 
+              fontWeight: '500', 
+              color: isDarkMode ? '#bfbfbf' : '#8c8c8c',
+              backgroundColor: isDarkMode ? '#2a2a2a' : '#f0f0f0',
+              padding: '4px 12px',
+              borderRadius: '4px',
+              border: `1px solid ${isDarkMode ? '#404040' : '#d9d9d9'}`
+            }}>
+              ({userData?.uid || 'Loading...'})
+            </div>
+          </div>
+          
           <Space align="center">
             <Button 
               icon={<ArrowLeftOutlined />} 
               onClick={() => navigate('/account/users')}
-              type="link"
-              style={{ padding: 0 }}
+              type="default"
+              size="small"
             >
-              &lt;&lt; Back to Users list
+              Back to Users
             </Button>
-          </Space>
-          
-          <Space align="center">
             <Button 
               icon={<ReloadOutlined />} 
               onClick={() => window.location.reload()}
@@ -311,17 +434,18 @@ const UserEdit: React.FC = () => {
           onChange={setActiveTab}
           className="custom-tabs"
           style={{ margin: 0 }}
-        >
-          <TabPane tab="General" key="general" />
-          <TabPane tab="Lines" key="lines" />
-          <TabPane tab="Adv. Telephony" key="telephony" />
-          <TabPane tab="Settings" key="settings" />
-          <TabPane tab="Screen Layout" key="screen" />
-          <TabPane tab="Video Stream" key="video" />
-          <TabPane tab="Call Notification" key="notification" />
-          <TabPane tab="Shortcuts" key="shortcuts" />
-          <TabPane tab="Call History" key="history" />
-        </Tabs>
+          items={[
+            { key: 'general', label: 'General' },
+            { key: 'lines', label: 'Lines' },
+            { key: 'telephony', label: 'Adv. Telephony' },
+            { key: 'settings', label: 'Settings' },
+            { key: 'screen', label: 'Screen Layout' },
+            { key: 'video', label: 'Video Stream' },
+            { key: 'notification', label: 'Call Notification' },
+            { key: 'shortcuts', label: 'Shortcuts' },
+            { key: 'history', label: 'Call History' }
+          ]}
+        />
       </div>
 
       {/* Main Content with Scroll */}
@@ -942,7 +1066,46 @@ const UserEdit: React.FC = () => {
               </div>
             )}
 
-            {activeTab !== 'general' && (
+            {activeTab === 'lines' && (
+              <div style={{
+                backgroundColor: isDarkMode ? '#1f1f1f' : '#fff',
+                border: `1px solid ${isDarkMode ? '#303030' : '#e8e8e8'}`,
+                borderRadius: '8px',
+                boxShadow: isDarkMode ? '0 2px 8px rgba(0, 0, 0, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                padding: '16px'
+              }}>
+                <GenericTable<LineData>
+                  uri="/api/lines"
+                  columns={linesColumns}
+                  dataSource={linesSampleData}
+                />
+              </div>
+            )}
+
+            {activeTab === 'settings' && (
+              <div style={{
+                backgroundColor: isDarkMode ? '#1f1f1f' : '#fff',
+                border: `1px solid ${isDarkMode ? '#303030' : '#e8e8e8'}`,
+                borderRadius: '8px',
+                boxShadow: isDarkMode ? '0 2px 8px rgba(0, 0, 0, 0.15)' : '0 2px 8px rgba(0, 0, 0, 0.08)',
+                padding: '0',
+                height: 'calc(100vh - 300px)',
+                overflow: 'hidden'
+              }}>
+                <SettingsPanel
+                  onUpdate={(settings) => {
+                    console.log('Settings updated:', settings);
+                    message.success('Settings updated successfully');
+                  }}
+                  onRefresh={() => {
+                    console.log('Settings refreshed');
+                    message.success('Settings refreshed');
+                  }}
+                />
+              </div>
+            )}
+
+            {activeTab !== 'general' && activeTab !== 'lines' && activeTab !== 'settings' && (
               <div style={{ textAlign: 'center', padding: '50px' }}>
                 <Text type="secondary">{activeTab} configuration will be implemented here</Text>
               </div>
@@ -952,6 +1115,6 @@ const UserEdit: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 export default UserEdit;

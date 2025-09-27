@@ -1,5 +1,5 @@
 // src/components/GenericTable.tsx
-import React, { useEffect, useState, useMemo, useRef, useCallback } from "react";
+import React, { useEffect, useState, useMemo, useRef, useCallback, memo } from "react";
 import { Table, Button, Space, Input, Select, message, Tooltip, theme, Skeleton } from "antd";
 import { ReloadOutlined, PlusOutlined, SettingOutlined, CloudOutlined, PhoneOutlined, UserOutlined, DatabaseOutlined, ClockCircleOutlined, ClearOutlined, SearchOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
@@ -23,13 +23,15 @@ interface GenericTableProps<T> {
   columns: ColumnsType<T>; // strongly typed columns
   columnConfigs?: ColumnConfig<T>[]; // configuration for which columns have filters
   statusConfig?: StatusConfig<T>; // optional status configuration
+  dataSource?: T[]; // optional data source to override API calls
 }
 
-function GenericTable<T extends { key: string | number }>({
+const GenericTable = memo(function GenericTable<T extends { key: string | number }>({
   uri,
   columns,
   columnConfigs = [],
   statusConfig,
+  dataSource: propDataSource,
 }: GenericTableProps<T>) {
   const { pageSize, resetSession } = useAppContext();
   const { token } = theme.useToken();
@@ -47,6 +49,14 @@ function GenericTable<T extends { key: string | number }>({
   const dataCacheRef = useRef<Map<string, { data: T[], timestamp: number }>>(new Map());
 
   const fetchData = useCallback(async (forceRefresh = false) => {
+    // If dataSource is provided as prop, use it instead of API
+    if (propDataSource) {
+      setData(propDataSource);
+      setLoading(false);
+      setInitialLoading(false);
+      return;
+    }
+
     const cacheKey = uri;
     const cache = dataCacheRef.current;
     const now = Date.now();
@@ -90,7 +100,7 @@ function GenericTable<T extends { key: string | number }>({
       setLoading(false);
       setInitialLoading(false);
     }
-  }, [uri, resetSession, initialLoading]);
+  }, [uri, resetSession, initialLoading, propDataSource]);
 
   useEffect(() => {
     fetchData();
@@ -437,10 +447,10 @@ function GenericTable<T extends { key: string | number }>({
             placeholder="Search all columns..."
             value={globalSearchText}
             onChange={(e) => setGlobalSearchText(e.target.value)}
-            style={{ width: 200 }}
+              style={{ width: 200 }}
             prefix={<SearchOutlined />}
-            allowClear
-          />
+              allowClear
+            />
         </Space>
       </div>
 
@@ -467,12 +477,12 @@ function GenericTable<T extends { key: string | number }>({
           </div>
         </div>
       ) : (
-        <Table
+      <Table
           rowKey="Uid"
-          rowSelection={rowSelection}
+        rowSelection={rowSelection}
           columns={finalColumns}
-          dataSource={filteredData}
-          loading={loading}
+        dataSource={filteredData}
+        loading={loading}
           pagination={{ 
             pageSize,
             current: currentPage,
@@ -505,8 +515,6 @@ function GenericTable<T extends { key: string | number }>({
       </div>
     </div>
   );
-};
+}) as <T extends { key: string | number }>(props: GenericTableProps<T>) => React.ReactElement;
 
-export default React.memo(GenericTable) as <T extends { key: string | number }>(
-  props: GenericTableProps<T>
-) => React.ReactElement;
+export default GenericTable;

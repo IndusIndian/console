@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useEffect, useMemo, useCallback, useState } from "react";
+import { useEffect, useMemo, useCallback, useState, memo } from "react";
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { useAppContext } from "./contexts/AppContext";
 import {
@@ -20,27 +20,42 @@ import "antd/dist/reset.css";
 import BTLogo from "./components/BTLogo";
 import Login from "./components/Login";
 import Home from "./components/Home";
-import Turrets from "./components/DeviceManagement/Turrets";
-import BTPT from "./components/DeviceManagement/BTPT";
-import TPOs from "./components/DeviceManagement/TPOs";
-import Users from "./components/AccountManagement/Users";
-import UserEdit from "./components/AccountManagement/UserEdit";
+import { lazy, Suspense } from "react";
+
+// Lazy load components for better performance
+const Turrets = lazy(() => import("./components/DeviceManagement/Turrets"));
+const BTPT = lazy(() => import("./components/DeviceManagement/BTPT"));
+const TPOs = lazy(() => import("./components/DeviceManagement/TPOs"));
+const Lines = lazy(() => import("./components/DeviceManagement/Lines"));
+const Zones = lazy(() => import("./components/DeviceManagement/Zones"));
+const BTPTClusters = lazy(() => import("./components/DeviceManagement/BTPTClusters"));
+const RecordingServers = lazy(() => import("./components/DeviceManagement/RecordingServers"));
+const Users = lazy(() => import("./components/AccountManagement/Users"));
+const UserEdit = lazy(() => import("./components/AccountManagement/UserEdit"));
 
 const { Header, Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
-export default function App() {
+const App = memo(function App() {
   const { pageSize, setPageSize, isDarkMode, toggleTheme, timeRemaining } = useAppContext();
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [pageLoading, setPageLoading] = useState(false);
 
-  // Add dark class to body for proper dark mode styling
+  // Add dark class to body for proper dark mode styling with smooth transition
   useEffect(() => {
+    // Temporarily disable transitions during class change to prevent flicker
+    document.body.classList.add('no-transition');
+    
     if (isDarkMode) {
       document.body.classList.add('dark');
     } else {
       document.body.classList.remove('dark');
     }
+    
+    // Re-enable transitions after a brief delay
+    requestAnimationFrame(() => {
+      document.body.classList.remove('no-transition');
+    });
   }, [isDarkMode]);
 
   // Page loading effect for smooth transitions
@@ -53,6 +68,30 @@ export default function App() {
   // helper for navigation links - memoized
   const nav = useCallback((path: string, label: string) => <Link to={path}>{label}</Link>, []);
 
+  // Memoize theme configuration for better performance
+  const themeConfig = useMemo(() => ({
+    algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
+    token: {
+      colorPrimary: "#6400AA", // BT purple
+      fontSize: 13,
+      controlHeight: 32,
+      colorBgContainer: isDarkMode ? "#141414" : "#ffffff",
+      colorBgElevated: isDarkMode ? "#1f1f1f" : "#ffffff",
+      colorText: isDarkMode ? "#ffffff" : "#000000",
+      colorTextSecondary: isDarkMode ? "#a6a6a6" : "#666666",
+      colorBorder: isDarkMode ? "#424242" : "#d9d9d9",
+      colorBorderSecondary: isDarkMode ? "#303030" : "#f0f0f0",
+      colorFillSecondary: isDarkMode ? "#262626" : "#fafafa",
+      colorFillTertiary: isDarkMode ? "#1f1f1f" : "#f5f5f5",
+      colorFillQuaternary: isDarkMode ? "#141414" : "#f0f0f0",
+    },
+    components: {
+      Menu: {
+        itemHeight: 28, // compact vertical menu
+      },
+    },
+  }), [isDarkMode]);
+
   // Full menu with routing paths - memoized
   const menuItems = useMemo(() => [
     {
@@ -60,15 +99,16 @@ export default function App() {
       label: "Device Management",
       children: [
         { key: "prod-tools", label: nav("/device/btpt", "Productivity Tools") },
-        { key: "prod-tools-clusters", label: nav("/device/prod-tools-clusters", "Productivity Tools Clusters") },
+        { key: "prod-tools-clusters", label: nav("/device/btptclusters", "Productivity Tools Clusters") },
         { key: "geo-groups", label: nav("/device/geographic-groups", "Geographic Groups") },
         { key: "turrets", label: nav("/device/turrets", "Turrets") },
+        { key: "lines", label: nav("/device/lines", "Lines") },
         { key: "mobile-traders", label: nav("/device/mobile-traders", "Mobile Traders") },
         { key: "pcs", label: nav("/device/pcs", "PCs") },
         { key: "tpos", label: nav("/device/tpos", "TPOs") },
+        { key: "zones", label: nav("/device/zones", "Zones") },
         { key: "tpo-clusters", label: nav("/device/tpo-clusters", "TPO Clusters") },
         { key: "tpo-floor", label: nav("/device/tpo-floor-map", "TPOs Floor Map") },
-        { key: "zones", label: nav("/device/zones", "Zones") },
         { key: "recording", label: nav("/device/recording-servers", "Recording Servers") },
         { key: "sip-gateways", label: nav("/device/sip-gateways", "SIP Private Wire Gateways") },
         { key: "pbx-clusters", label: nav("/device/pbx-clusters", "PBX Clusters") },
@@ -176,30 +216,7 @@ export default function App() {
   }
 
   return (
-    <ConfigProvider
-      theme={{
-        algorithm: isDarkMode ? darkAlgorithm : defaultAlgorithm,
-        token: {
-          colorPrimary: "#6400AA", // BT purple
-          fontSize: 13,
-          controlHeight: 32,
-          colorBgContainer: isDarkMode ? "#141414" : "#ffffff",
-          colorBgElevated: isDarkMode ? "#1f1f1f" : "#ffffff",
-          colorText: isDarkMode ? "#ffffff" : "#000000",
-          colorTextSecondary: isDarkMode ? "#a6a6a6" : "#666666",
-          colorBorder: isDarkMode ? "#424242" : "#d9d9d9",
-          colorBorderSecondary: isDarkMode ? "#303030" : "#f0f0f0",
-          colorFillSecondary: isDarkMode ? "#262626" : "#fafafa",
-          colorFillTertiary: isDarkMode ? "#1f1f1f" : "#f5f5f5",
-          colorFillQuaternary: isDarkMode ? "#141414" : "#f0f0f0",
-        },
-        components: {
-          Menu: {
-            itemHeight: 28, // compact vertical menu
-          },
-        },
-      }}
-    >
+    <ConfigProvider theme={themeConfig}>
       <Layout style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
         {/* === FIXED HEADER === */}
         <Header
@@ -214,6 +231,7 @@ export default function App() {
             background: "#6400AA",
             height: "64px",
             flexShrink: 0,
+            transition: "background-color 0.3s ease, color 0.3s ease"
           }}
         >
           <div
@@ -278,9 +296,20 @@ export default function App() {
               </Dropdown>
 
               {/* Theme switch */}
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span>{isDarkMode ? "Dark" : "Light"}</span>
-                <Switch checked={isDarkMode} onChange={toggleTheme} />
+              <div style={{ 
+                display: "flex", 
+                alignItems: "center", 
+                gap: 6,
+                transition: "all 0.3s ease"
+              }}>
+                <span style={{ transition: "color 0.3s ease" }}>
+                  {isDarkMode ? "Dark" : "Light"}
+                </span>
+                <Switch 
+                  checked={isDarkMode} 
+                  onChange={toggleTheme}
+                  style={{ transition: "all 0.3s ease" }}
+                />
               </div>
 
               {/* Logout */}
@@ -308,6 +337,15 @@ export default function App() {
             right: 0,
             zIndex: 999,
             flexShrink: 0,
+            transition: "background-color 0.3s ease, color 0.3s ease",
+            padding: "0 24px",
+            background: isDarkMode 
+              ? "linear-gradient(135deg, #1f1f1f 0%, #262626 100%)" 
+              : "linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)",
+            borderBottom: isDarkMode ? "1px solid #303030" : "1px solid #e8e8e8",
+            boxShadow: isDarkMode 
+              ? "0 2px 8px rgba(0, 0, 0, 0.3)" 
+              : "0 2px 8px rgba(0, 0, 0, 0.06)"
           }}
         >
           <Menu
@@ -322,6 +360,10 @@ export default function App() {
               flex: 1,
               minHeight: "48px",
               maxHeight: "48px",
+              transition: "background-color 0.3s ease, color 0.3s ease",
+              background: "transparent",
+              border: "none",
+              boxShadow: "none"
             }}
             overflowedIndicator={null}
           />
@@ -337,7 +379,8 @@ export default function App() {
             flex: 1,
             minHeight: "calc(100vh - 144px)", // Minimum height
             display: "flex",
-            flexDirection: "column"
+            flexDirection: "column",
+            transition: "background-color 0.3s ease, color 0.3s ease"
           }}
         >
           <Spin 
@@ -353,11 +396,51 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Navigate to="/" replace />} />
-              <Route path="/device/turrets" element={<Turrets/>} />
-              <Route path="/device/btpt" element={<BTPT/>} />
-              <Route path="/device/tpos" element={<TPOs/>} />
-              <Route path="/account/users" element={<Users/>} />
-              <Route path="/account/users/:id/edit" element={<UserEdit/>} />
+              <Route path="/device/turrets" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Turrets/>
+                </Suspense>
+              } />
+              <Route path="/device/lines" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Lines/>
+                </Suspense>
+              } />
+              <Route path="/device/btpt" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <BTPT/>
+                </Suspense>
+              } />
+              <Route path="/device/tpos" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <TPOs/>
+                </Suspense>
+              } />
+              <Route path="/device/zones" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Zones/>
+                </Suspense>
+              } />
+              <Route path="/device/btptclusters" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <BTPTClusters/>
+                </Suspense>
+              } />
+              <Route path="/device/recording-servers" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <RecordingServers/>
+                </Suspense>
+              } />
+              <Route path="/account/users" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <Users/>
+                </Suspense>
+              } />
+              <Route path="/account/users/:id/edit" element={
+                <Suspense fallback={<div>Loading...</div>}>
+                  <UserEdit/>
+                </Suspense>
+              } />
               {/* Catch-all route - redirect any invalid URLs to home */}
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
@@ -381,6 +464,7 @@ export default function App() {
             alignItems: "center",
             fontSize: "12px",
             color: "#666",
+            transition: "background-color 0.3s ease, color 0.3s ease"
           }}
         >
           <div style={{ textAlign: "left", flex: 1 }}>
@@ -396,4 +480,6 @@ export default function App() {
       </Layout>
     </ConfigProvider>
   );
-}
+});
+
+export default App;

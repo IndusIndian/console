@@ -11,6 +11,9 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* Smooth theme transitions */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Dark mode root */
@@ -34,11 +37,327 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   overflow-y: auto;
+  
+  /* Smooth theme transitions */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Dark mode body background */
 .dark body {
   background-color: #141414;
+}
+
+/* Global smooth transitions for theme switching */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Disable transitions for specific elements that shouldn't animate */
+.no-transition,
+.no-transition * {
+  transition: none !important;
+}
+
+/* Smooth transitions for Ant Design components */
+.ant-layout,
+.ant-layout-header,
+.ant-layout-content,
+.ant-layout-footer,
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu,
+.ant-table,
+.ant-table-thead > tr > th,
+.ant-table-tbody > tr > td,
+.ant-card,
+.ant-form,
+.ant-form-item,
+.ant-input,
+.ant-select,
+.ant-button,
+.ant-switch,
+.ant-dropdown,
+.ant-tooltip,
+.ant-spin,
+.ant-tabs,
+.ant-tabs-tab,
+.ant-tabs-content,
+.ant-list,
+.ant-list-item,
+.ant-checkbox,
+.ant-radio,
+.ant-select-selector,
+.ant-picker,
+.ant-modal,
+.ant-drawer,
+.ant-popover,
+.ant-message,
+.ant-notification {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+/* Professional Horizontal Menu Styling */
+.ant-menu-horizontal {
+  border-bottom: 1px solid #e8e8e8 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%) !important;
+}
+
+.dark .ant-menu-horizontal {
+  border-bottom: 1px solid #303030 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  background: linear-gradient(135deg, #1f1f1f 0%, #262626 100%) !important;
+}
+
+.ant-menu-horizontal .ant-menu-item {
+  height: 48px !important;
+  line-height: 48px !important;
+  padding: 0 20px !important;
+  margin: 0 2px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  color: #262626 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.dark .ant-menu-horizontal .ant-menu-item {
+  color: #e6e6e6 !important;
+}
+
+.ant-menu-horizontal .ant-menu-item:hover {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+  color: #ffffff !important;
+  border-color: #722ed1 !important;
+  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+  color: #ffffff !important;
+  border-color: #722ed1 !important;
+  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.4) !important;
+  font-weight: 600 !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected a {
+  color: #ffffff !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected::after {
+  display: none !important;
+}
+
+/* Submenu styling */
+.ant-menu-horizontal .ant-menu-submenu {
+  height: 48px !important;
+  line-height: 48px !important;
+  padding: 0 20px !important;
+  margin: 0 2px !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  font-size: 14px !important;
+  color: #262626 !important;
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.dark .ant-menu-horizontal .ant-menu-submenu {
+  color: #e6e6e6 !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu:hover {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+  color: #ffffff !important;
+  border-color: #722ed1 !important;
+  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.3) !important;
+  transform: translateY(-1px) !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu-selected {
+  background: linear-gradient(135deg, #722ed1 0%, #9254de 100%) !important;
+  color: #ffffff !important;
+  border-color: #722ed1 !important;
+  box-shadow: 0 4px 12px rgba(114, 46, 209, 0.4) !important;
+  font-weight: 600 !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu-selected .ant-menu-submenu-title {
+  color: #ffffff !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu-selected .ant-menu-submenu-arrow {
+  color: #ffffff !important;
+}
+
+/* Dropdown menu styling */
+.ant-menu-submenu-popup {
+  border-radius: 8px !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12) !important;
+  border: 1px solid #e8e8e8 !important;
+  background: #ffffff !important;
+  padding: 8px 0 !important;
+}
+
+.dark .ant-menu-submenu-popup {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+  border: 1px solid #303030 !important;
+  background: #1f1f1f !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item {
+  height: 36px !important;
+  line-height: 36px !important;
+  padding: 0 16px !important;
+  margin: 2px 8px !important;
+  border-radius: 4px !important;
+  font-size: 13px !important;
+  color: #262626 !important;
+  background: transparent !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.dark .ant-menu-submenu-popup .ant-menu-item {
+  color: #e6e6e6 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item:hover {
+  background: #f0f0f0 !important;
+  color: #722ed1 !important;
+}
+
+.dark .ant-menu-submenu-popup .ant-menu-item:hover {
+  background: #2a2a2a !important;
+  color: #9254de !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected {
+  background: #722ed1 !important;
+  color: #ffffff !important;
+  font-weight: 500 !important;
+}
+
+.ant-menu-submenu-popup .ant-menu-item-selected a {
+  color: #ffffff !important;
+}
+
+/* Menu item active indicator */
+.ant-menu-horizontal .ant-menu-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #722ed1, #9254de);
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected::before {
+  width: 80%;
+}
+
+.ant-menu-horizontal .ant-menu-item:hover::before {
+  width: 60%;
+}
+
+/* Professional menu enhancements */
+.ant-menu-horizontal .ant-menu-item a {
+  color: inherit !important;
+  text-decoration: none !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  line-height: 48px !important;
+  transition: color 0.3s ease !important;
+}
+
+.ant-menu-horizontal .ant-menu-item:hover a {
+  color: #ffffff !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected a {
+  color: #ffffff !important;
+}
+
+/* Menu item focus states */
+.ant-menu-horizontal .ant-menu-item:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(114, 46, 209, 0.2) !important;
+}
+
+.ant-menu-horizontal .ant-menu-item:focus-visible {
+  outline: 2px solid #722ed1 !important;
+  outline-offset: 2px !important;
+}
+
+/* Submenu arrow styling */
+.ant-menu-horizontal .ant-menu-submenu .ant-menu-submenu-title {
+  padding: 0 20px !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  border-radius: 6px !important;
+  margin: 0 2px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu .ant-menu-submenu-arrow {
+  color: inherit !important;
+  transition: color 0.3s ease !important;
+}
+
+.ant-menu-horizontal .ant-menu-submenu:hover .ant-menu-submenu-arrow {
+  color: #ffffff !important;
+}
+
+/* Menu container professional styling */
+.ant-menu-horizontal {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+}
+
+/* Responsive menu adjustments */
+@media (max-width: 1200px) {
+  .ant-menu-horizontal .ant-menu-item {
+    padding: 0 16px !important;
+    font-size: 13px !important;
+  }
+  
+  .ant-menu-horizontal .ant-menu-submenu .ant-menu-submenu-title {
+    padding: 0 16px !important;
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .ant-menu-horizontal .ant-menu-item {
+    padding: 0 12px !important;
+    font-size: 12px !important;
+  }
+  
+  .ant-menu-horizontal .ant-menu-submenu .ant-menu-submenu-title {
+    padding: 0 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+/* Smooth transitions for custom components */
+.settings-mode-tabs,
+.settings-mode-tab,
+.settings-checkbox,
+.settings-radio {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease !important;
 }
 
 h1 {
@@ -652,4 +971,233 @@ html, body, #root {
 
 .user-edit-form .ant-form-item:focus-within .ant-form-item-label > label::after {
   width: 100%;
+}
+
+/* Custom Settings Checkbox Styling - BT Purple Theme */
+.settings-checkbox {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  border: 2px solid #d9d9d9 !important;
+  border-radius: 3px !important;
+  background-color: #fff !important;
+  position: relative !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  transition: all 0.2s ease !important;
+}
+
+.settings-checkbox:hover {
+  border-color: #722ed1 !important;
+}
+
+.settings-checkbox:checked {
+  background-color: #722ed1 !important;
+  border-color: #722ed1 !important;
+}
+
+.settings-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+/* Dark theme checkbox */
+.dark .settings-checkbox {
+  border-color: #666 !important;
+  background-color: #1f1f1f !important;
+}
+
+.dark .settings-checkbox:hover {
+  border-color: #722ed1 !important;
+}
+
+.dark .settings-checkbox:checked {
+  background-color: #722ed1 !important;
+  border-color: #722ed1 !important;
+}
+
+.dark .settings-checkbox:checked::after {
+  color: white;
+}
+
+/* Custom Settings Radio Button Styling - BT Purple Theme */
+.settings-radio {
+  width: 16px !important;
+  height: 16px !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  border: 2px solid #d9d9d9 !important;
+  border-radius: 50% !important;
+  background-color: #fff !important;
+  position: relative !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  transition: all 0.2s ease !important;
+}
+
+.settings-radio:hover {
+  border-color: #722ed1 !important;
+}
+
+.settings-radio:checked {
+  background-color: #722ed1 !important;
+  border-color: #722ed1 !important;
+}
+
+.settings-radio:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: white;
+}
+
+/* Dark theme radio buttons */
+.dark .settings-radio {
+  border-color: #666 !important;
+  background-color: #1f1f1f !important;
+}
+
+.dark .settings-radio:hover {
+  border-color: #722ed1 !important;
+}
+
+.dark .settings-radio:checked {
+  background-color: #722ed1 !important;
+  border-color: #722ed1 !important;
+}
+
+.dark .settings-radio:checked::after {
+  background-color: white;
+}
+
+/* Settings Mode Tabs - Exact match to UserEdit tabs with arrow separators */
+.settings-mode-tabs {
+  display: flex;
+  margin-bottom: 6px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  padding: 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  width: fit-content;
+}
+
+.settings-mode-tab {
+  flex: 0 0 auto;
+  padding: 6px 16px;
+  background: #e0e0e0;
+  border: none;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  text-transform: capitalize;
+  color: #000;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  width: 80px;
+}
+
+/* Arrow separator for all tabs except the last one */
+.settings-mode-tab:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid #e0e0e0;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  z-index: 2;
+}
+
+/* Active tab styling */
+.settings-mode-tab.active {
+  background: #f0f0f0;
+  color: #722ed1;
+  z-index: 3;
+}
+
+/* Arrow separator for active tab */
+.settings-mode-tab.active:not(:last-child)::after {
+  border-left-color: #f0f0f0;
+}
+
+/* Arrow separator for tab before active tab */
+.settings-mode-tab.active ~ .settings-mode-tab:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-right: 6px solid #f0f0f0;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  z-index: 2;
+}
+
+/* Hover effect */
+.settings-mode-tab:hover:not(.active) {
+  background: #d0d0d0;
+  color: #722ed1;
+}
+
+.settings-mode-tab:hover:not(.active):not(:last-child)::after {
+  border-left-color: #d0d0d0;
+}
+
+/* Dark theme for settings mode tabs */
+.dark .settings-mode-tabs {
+  background: #2a2a2a;
+}
+
+.dark .settings-mode-tab {
+  background: #1f1f1f;
+  color: #fff;
+}
+
+.dark .settings-mode-tab:not(:last-child)::after {
+  border-left-color: #1f1f1f;
+}
+
+.dark .settings-mode-tab.active {
+  background: #2a2a2a;
+  color: #722ed1;
+}
+
+.dark .settings-mode-tab.active:not(:last-child)::after {
+  border-left-color: #2a2a2a;
+}
+
+.dark .settings-mode-tab.active ~ .settings-mode-tab:not(:last-child)::before {
+  border-right-color: #2a2a2a;
+}
+
+.dark .settings-mode-tab:hover:not(.active) {
+  background: #333;
+  color: #9254de;
+}
+
+.dark .settings-mode-tab:hover:not(.active):not(:last-child)::after {
+  border-left-color: #333;
 }

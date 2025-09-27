@@ -14,16 +14,45 @@ export default defineConfig({
     // Optimize bundle size
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          antd: ['antd', '@ant-design/icons'],
-          router: ['react-router-dom'],
-          utils: ['axios']
+        manualChunks: (id) => {
+          // Vendor chunks
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('antd') || id.includes('@ant-design')) {
+              return 'antd-vendor';
+            }
+            if (id.includes('react-router')) {
+              return 'router-vendor';
+            }
+            if (id.includes('axios')) {
+              return 'utils-vendor';
+            }
+            return 'vendor';
+          }
+          // App chunks
+          if (id.includes('src/components/Templates')) {
+            return 'templates';
+          }
+          if (id.includes('src/components/AccountManagement')) {
+            return 'account';
+          }
+          if (id.includes('src/components/DeviceManagement')) {
+            return 'device';
+          }
+          if (id.includes('src/contexts')) {
+            return 'contexts';
+          }
         }
       }
     },
     // Enable minification
-    minify: 'esbuild'
+    minify: 'esbuild',
+    // Optimize chunk size
+    chunkSizeWarningLimit: 1000,
+    // Enable source maps for debugging
+    sourcemap: false
   },
   // Optimize dependencies
   optimizeDeps: {
