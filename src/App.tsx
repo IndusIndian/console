@@ -1,6 +1,6 @@
 // src/App.tsx
-import { useState, useEffect } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { useEffect, useMemo, useCallback, useState } from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { useAppContext } from "./contexts/AppContext";
 import {
   ConfigProvider,
@@ -10,6 +10,7 @@ import {
   theme,
   Select,
   Dropdown,
+  Spin,
 } from "antd";
 import {
   DownOutlined,
@@ -17,17 +18,21 @@ import {
 } from "@ant-design/icons";
 import "antd/dist/reset.css";
 import BTLogo from "./components/BTLogo";
+import Login from "./components/Login";
 import Home from "./components/Home";
 import Turrets from "./components/DeviceManagement/Turrets";
 import BTPT from "./components/DeviceManagement/BTPT";
 import TPOs from "./components/DeviceManagement/TPOs";
 import Users from "./components/AccountManagement/Users";
+import UserEdit from "./components/AccountManagement/UserEdit";
 
 const { Header, Content, Footer } = Layout;
 const { defaultAlgorithm, darkAlgorithm } = theme;
 
 export default function App() {
-  const { pageSize, setPageSize, isDarkMode, toggleTheme } = useAppContext();
+  const { pageSize, setPageSize, isDarkMode, toggleTheme, timeRemaining } = useAppContext();
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
 
   // Add dark class to body for proper dark mode styling
   useEffect(() => {
@@ -38,11 +43,18 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  // helper for navigation links
-  const nav = (path: string, label: string) => <Link to={path}>{label}</Link>;
+  // Page loading effect for smooth transitions
+  useEffect(() => {
+    setPageLoading(true);
+    const timer = setTimeout(() => setPageLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
 
-  // Full menu with routing paths
-  const menuItems = [
+  // helper for navigation links - memoized
+  const nav = useCallback((path: string, label: string) => <Link to={path}>{label}</Link>, []);
+
+  // Full menu with routing paths - memoized
+  const menuItems = useMemo(() => [
     {
       key: "device",
       label: "Device Management",
@@ -88,16 +100,6 @@ export default function App() {
       children: [
         { key: "apps", label: nav("/security/applications", "Applications") },
         { key: "passwords", label: nav("/security/password-policies", "Password Policies") },
-      ],
-    },
-    {
-      key: "console",
-      label: "Console",
-      children: [
-        { key: "admins", label: nav("/console/administrators", "Administrators") },
-        { key: "groups", label: nav("/console/admin-groups", "Administrator Groups") },
-        { key: "password", label: nav("/console/admin-password", "Admin. Password") },
-        { key: "help", label: nav("/console/help", "Help") },
       ],
     },
     {
@@ -156,7 +158,22 @@ export default function App() {
         { key: "announcements", label: nav("/system/announcement-messages", "Announcement Messages") },
       ],
     },
-  ];
+    {
+      key: "console",
+      label: "Console",
+      children: [
+        { key: "admins", label: nav("/console/administrators", "Administrators") },
+        { key: "groups", label: nav("/console/admin-groups", "Administrator Groups") },
+        { key: "password", label: nav("/console/admin-password", "Admin. Password") },
+        { key: "help", label: nav("/console/help", "Help") },
+      ],
+    },
+  ], [nav]);
+
+  // Show login page if not logged in
+  if (!isLoggedIn) {
+    return <Login onLogin={() => setIsLoggedIn(true)} />;
+  }
 
   return (
     <ConfigProvider
@@ -218,7 +235,7 @@ export default function App() {
               fontSize: "1.1rem" 
             }}>
               <BTLogo size={36} />
-              <span>BT Trading & Command</span>
+              <span>Trading & Command</span>
             </div>
 
             {/* Right: Items per page, Username, Theme, Logout */}
@@ -274,6 +291,7 @@ export default function App() {
                   alignItems: "center",
                   gap: 4,
                 }}
+                onClick={() => setIsLoggedIn(false)}
               >
                 <LogoutOutlined /> Logout
               </span>
@@ -313,39 +331,67 @@ export default function App() {
         <Content 
           style={{ 
             marginTop: "112px", // 64px header + 48px menu
-            marginBottom: "40px", // Footer height
+            marginBottom: "32px", // Space for footer
             padding: 24,
-            overflow: "hidden", // No scrolling on main content
+            overflow: "auto", // Allow scrolling on main content
             flex: 1,
-            height: "calc(100vh - 152px)", // Fixed height, no min-height
+            minHeight: "calc(100vh - 144px)", // Minimum height
+            display: "flex",
+            flexDirection: "column"
           }}
         >
-          <Routes>
-            <Route path="/" element={<Home />} />            
-            <Route path="/device/turrets" element={<Turrets/>} />
-            <Route path="/device/btpt" element={<BTPT/>} />
-            <Route path="/device/tpos" element={<TPOs/>} />
-            <Route path="/account/users" element={<Users/>} />
-            {/* you can add all route components here later */}
-          </Routes>
+          <Spin 
+            spinning={pageLoading} 
+            tip="Loading..."
+            style={{ 
+              minHeight: '200px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Navigate to="/" replace />} />
+              <Route path="/device/turrets" element={<Turrets/>} />
+              <Route path="/device/btpt" element={<BTPT/>} />
+              <Route path="/device/tpos" element={<TPOs/>} />
+              <Route path="/account/users" element={<Users/>} />
+              <Route path="/account/users/:id/edit" element={<UserEdit/>} />
+              {/* Catch-all route - redirect any invalid URLs to home */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Spin>
         </Content>
 
         {/* === FOOTER === */}
         <Footer 
           style={{ 
-            textAlign: "center",
             position: "fixed",
             bottom: 0,
             left: 0,
             right: 0,
-            height: "40px",
-            lineHeight: "40px",
-            padding: "8px 24px",
+            height: "32px",
+            lineHeight: "32px",
+            padding: "4px 16px",
             flexShrink: 0,
             zIndex: 998,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            fontSize: "12px",
+            color: "#666",
           }}
         >
-          © {new Date().getFullYear()} BT Trading & Command
+          <div style={{ textAlign: "left", flex: 1 }}>
+            Copyright © 2005-{new Date().getFullYear()} BT GROUP PLC All rights reserved.
+          </div>
+          <div style={{ textAlign: "center", flex: 1 }}>
+            {timeRemaining || 'Session not started'}
+          </div>
+          <div style={{ textAlign: "right", flex: 1 }}>
+            10.1.3.58541
+          </div>
         </Footer>
       </Layout>
     </ConfigProvider>

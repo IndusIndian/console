@@ -1,5 +1,5 @@
 // src/components/DeviceManagement/TPOs.tsx
-
+import React from "react";
 import GenericTable from "../Templates/GenericTable";
 import { Space, Tooltip, Button } from "antd";
 import { LinkOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -35,47 +35,42 @@ const columns = [
   {
     title: "User Login",
     dataIndex: "Userlogin",
-    sorter: (a: TPOs, b: TPOs) => a.Userlogin.localeCompare(b.Userlogin),
+    sorter: (a: TPOs, b: TPOs) => (a.Userlogin || '').localeCompare(b.Userlogin || ''),
   },
   {
     title: "First Name",
     dataIndex: "Firstname",
-    sorter: (a: TPOs, b: TPOs) => a.Firstname.localeCompare(b.Firstname),
+    sorter: (a: TPOs, b: TPOs) => (a.Firstname || '').localeCompare(b.Firstname || ''),
   },
   {
     title: "Last Name",
     dataIndex: "Lastname",
-    sorter: (a: TPOs, b: TPOs) => a.Lastname.localeCompare(b.Lastname),
-  },
-  {
-    title: "Status",
-    dataIndex: "Status",
-    sorter: (a: TPOs, b: TPOs) => a.Status.localeCompare(b.Status),
+    sorter: (a: TPOs, b: TPOs) => (a.Lastname || '').localeCompare(b.Lastname || ''),
   },
   {
     title: "Model ID",
     dataIndex: "Modelid",
-    sorter: (a: TPOs, b: TPOs) => a.Modelid.toString().localeCompare(b.Modelid.toString()),
+    sorter: (a: TPOs, b: TPOs) => String(a.Modelid || '').localeCompare(String(b.Modelid || '')),
   },
   {
     title: "Bootstrap Level",
     dataIndex: "Bootstraplevel",
-    sorter: (a: TPOs, b: TPOs) => a.Bootstraplevel.localeCompare(b.Bootstraplevel),
+    sorter: (a: TPOs, b: TPOs) => (a.Bootstraplevel || '').localeCompare(b.Bootstraplevel || ''),
   },
   {
     title: "Application Level",
     dataIndex: "Applicationlevel",
-    sorter: (a: TPOs, b: TPOs) => a.Applicationlevel.localeCompare(b.Applicationlevel),
+    sorter: (a: TPOs, b: TPOs) => (a.Applicationlevel || '').localeCompare(b.Applicationlevel || ''),
   },
   {
     title: "IP Address",
     dataIndex: "Ipaddress",
-    sorter: (a: TPOs, b: TPOs) => a.Ipaddress.localeCompare(b.Ipaddress),
+    sorter: (a: TPOs, b: TPOs) => (a.Ipaddress || '').localeCompare(b.Ipaddress || ''),
   },
   {
     title: "Hostname",
     dataIndex: "Hostname",
-    sorter: (a: TPOs, b: TPOs) => a.Hostname.localeCompare(b.Hostname),
+    sorter: (a: TPOs, b: TPOs) => (a.Hostname || '').localeCompare(b.Hostname || ''),
   },
   {
     title: "Actions",
@@ -95,15 +90,32 @@ const columns = [
   },
 ];
 
-const TPOs = () => {
+const TPOs = React.memo(() => {
+  const columnConfigs = [
+    { dataIndex: "Userlogin" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Firstname" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Lastname" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Bootstraplevel" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Applicationlevel" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Status" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Operatingsystem" as keyof TPOs, filterable: true, sortable: true },
+    { dataIndex: "Modelid" as keyof TPOs, filterable: true, sortable: true }
+  ];
+
   return (
     <GenericTable<TPOs>
       uri="http://localhost:4000/tpos"
       columns={columns}
-      searchField="Userlogin"
-      filterField="Status"
+      columnConfigs={columnConfigs}
+      statusConfig={{
+        showStatus: true,
+        statusField: "Status",
+        iconType: "server"
+      }}
     />
   );
-};
+});
+
+TPOs.displayName = 'TPOs';
 
 export default TPOs;

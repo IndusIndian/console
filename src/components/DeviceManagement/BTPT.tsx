@@ -1,5 +1,5 @@
 // src/components/DeviceManagement/BTPT.tsx
-
+import React from "react";
 import GenericTable from "../Templates/GenericTable";
 import { Space, Tooltip, Button } from "antd";
 import { LinkOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -47,52 +47,47 @@ const columns = [
   {
     title: "User Login",
     dataIndex: "Userlogin",
-    sorter: (a: BTPT, b: BTPT) => a.Userlogin.localeCompare(b.Userlogin),
+    sorter: (a: BTPT, b: BTPT) => (a.Userlogin || '').localeCompare(b.Userlogin || ''),
   },
   {
     title: "First Name",
     dataIndex: "Firstname",
-    sorter: (a: BTPT, b: BTPT) => a.Firstname.localeCompare(b.Firstname),
+    sorter: (a: BTPT, b: BTPT) => (a.Firstname || '').localeCompare(b.Firstname || ''),
   },
   {
     title: "Last Name",
     dataIndex: "Lastname",
-    sorter: (a: BTPT, b: BTPT) => a.Lastname.localeCompare(b.Lastname),
-  },
-  {
-    title: "Status",
-    dataIndex: "Status",
-    sorter: (a: BTPT, b: BTPT) => a.Status.localeCompare(b.Status),
+    sorter: (a: BTPT, b: BTPT) => (a.Lastname || '').localeCompare(b.Lastname || ''),
   },
   {
     title: "Model ID",
     dataIndex: "Modelid",
-    sorter: (a: BTPT, b: BTPT) => a.Modelid.toString().localeCompare(b.Modelid.toString()),
+    sorter: (a: BTPT, b: BTPT) => String(a.Modelid || '').localeCompare(String(b.Modelid || '')),
   },
   {
     title: "Operating System",
     dataIndex: "Operatingsystem",
-    sorter: (a: BTPT, b: BTPT) => a.Operatingsystem.localeCompare(b.Operatingsystem),
+    sorter: (a: BTPT, b: BTPT) => (a.Operatingsystem || '').localeCompare(b.Operatingsystem || ''),
   },
   {
     title: "Bootstrap Level",
     dataIndex: "Bootstraplevel",
-    sorter: (a: BTPT, b: BTPT) => a.Bootstraplevel.localeCompare(b.Bootstraplevel),
+    sorter: (a: BTPT, b: BTPT) => (a.Bootstraplevel || '').localeCompare(b.Bootstraplevel || ''),
   },
   {
     title: "Application Level",
     dataIndex: "Applicationlevel",
-    sorter: (a: BTPT, b: BTPT) => a.Applicationlevel.localeCompare(b.Applicationlevel),
+    sorter: (a: BTPT, b: BTPT) => (a.Applicationlevel || '').localeCompare(b.Applicationlevel || ''),
   },
   {
     title: "IP Address",
     dataIndex: "Ipaddress",
-    sorter: (a: BTPT, b: BTPT) => a.Ipaddress.localeCompare(b.Ipaddress),
+    sorter: (a: BTPT, b: BTPT) => (a.Ipaddress || '').localeCompare(b.Ipaddress || ''),
   },
   {
     title: "Hostname",
     dataIndex: "Hostname",
-    sorter: (a: BTPT, b: BTPT) => a.Hostname.localeCompare(b.Hostname),
+    sorter: (a: BTPT, b: BTPT) => (a.Hostname || '').localeCompare(b.Hostname || ''),
   },
   {
     title: "Actions",
@@ -112,15 +107,32 @@ const columns = [
   },
 ];
 
-const BTPT = () => {
+const BTPT = React.memo(() => {
+  const columnConfigs = [
+    { dataIndex: "Userlogin" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Firstname" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Lastname" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Bootstraplevel" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Applicationlevel" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Status" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Operatingsystem" as keyof BTPT, filterable: true, sortable: true },
+    { dataIndex: "Modelid" as keyof BTPT, filterable: true, sortable: true }
+  ];
+
   return (
     <GenericTable<BTPT>
       uri="http://localhost:4000/btpt"
       columns={columns}
-      searchField="Userlogin"
-      filterField="Status"
+      columnConfigs={columnConfigs}
+      statusConfig={{
+        showStatus: true,
+        statusField: "Status",
+        iconType: "server"
+      }}
     />
   );
-};
+});
+
+BTPT.displayName = 'BTPT';
 
 export default BTPT;

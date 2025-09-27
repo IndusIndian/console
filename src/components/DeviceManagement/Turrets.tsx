@@ -1,5 +1,5 @@
 // src/components/Turrets.tsx
-
+import React from "react";
 import GenericTable from "../Templates/GenericTable";
 import { Space, Tooltip, Button } from "antd";
 import { LinkOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
@@ -10,6 +10,7 @@ interface Entity {
   Bootstraplevel: string;
   Applicationlevel: string;
   Ipaddress: string;
+  Status?: string;
   key: string;
 }
 
@@ -17,22 +18,22 @@ const columns = [
   {
     title: "User Login",
     dataIndex: "Userlogin",
-    sorter: (a: Entity, b: Entity) => a.Userlogin.localeCompare(b.Userlogin),
+    sorter: (a: Entity, b: Entity) => (a.Userlogin || '').localeCompare(b.Userlogin || ''),
   },
   {
     title: "Bootstrap Level",
     dataIndex: "Bootstraplevel",
-    sorter: (a: Entity, b: Entity) => a.Bootstraplevel.localeCompare(b.Bootstraplevel),
+    sorter: (a: Entity, b: Entity) => (a.Bootstraplevel || '').localeCompare(b.Bootstraplevel || ''),
   },
   {
     title: "Application Level",
     dataIndex: "Applicationlevel",
-    sorter: (a: Entity, b: Entity) => a.Applicationlevel.localeCompare(b.Applicationlevel),
+    sorter: (a: Entity, b: Entity) => (a.Applicationlevel || '').localeCompare(b.Applicationlevel || ''),
   },
   {
     title: "IP Address",
     dataIndex: "Ipaddress",
-    sorter: (a: Entity, b: Entity) => a.Ipaddress.localeCompare(b.Ipaddress),
+    sorter: (a: Entity, b: Entity) => (a.Ipaddress || '').localeCompare(b.Ipaddress || ''),
   },
   {
     title: "Actions",
@@ -52,15 +53,28 @@ const columns = [
   },
 ];
 
-const Turrets = () => {
+const Turrets = React.memo(() => {
+  const columnConfigs = [
+    { dataIndex: "Userlogin" as keyof Entity, filterable: true, sortable: true },
+    { dataIndex: "Bootstraplevel" as keyof Entity, filterable: true, sortable: true },
+    { dataIndex: "Applicationlevel" as keyof Entity, filterable: true, sortable: true },
+    { dataIndex: "Ipaddress" as keyof Entity, filterable: true, sortable: true }
+  ];
+
   return (
     <GenericTable<Entity>
       uri="http://localhost:4000/turrets"
       columns={columns}
-      searchField="Userlogin"
-      filterField="Bootstraplevel"
+      columnConfigs={columnConfigs}
+      statusConfig={{
+        showStatus: true,
+        statusField: "Status",
+        iconType: "phone"
+      }}
     />
   );
-};
+});
+
+Turrets.displayName = 'Turrets';
 
 export default Turrets;
